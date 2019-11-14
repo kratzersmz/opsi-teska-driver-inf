@@ -1,0 +1,52 @@
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/en/credits/
+ 
+ 
+[Actions]
+requiredWinstVersion >= "4.10.8.6"
+setloglevel = 6
+ 
+DefVar $MsiId32$
+DefVar $MsiId64$
+DefVar $LogDir$
+DefVar $ProductId$  
+DefVar $MinimumSpace$
+DefVar $InstallDir$
+DefVar $ExitCode$
+ 
+Set $LogDir$ = "%SystemDrive%\tmp"
+ 
+; ----------------------------------------------------------------
+; - Please edit the following values                             -
+; ----------------------------------------------------------------
+Set $ProductId$       = "teska-driver-inf"
+Set $MinimumSpace$    = "6 MB"
+; the path were we find the product after the installation
+; ----------------------------------------------------------------
+ 
+if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
+	LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+	isFatalError
+	; Stop process and set installation status to failed
+else
+	comment "Show product picture"
+	ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+ 
+	if FileExists("%ScriptPath%\delsub.ins")
+		comment "Start uninstall sub section"
+		Sub "%ScriptPath%\delsub.ins"
+	endif
+ 
+	Message "Installing " + $ProductId$ + " ..."
+ 
+	comment "Start setup program"
+	; extract it with 7zip and you will get two msi files (32/64)
+	ChangeDirectory "%SCRIPTPATH%"
+	Winbatch_install_64 /Sysnative /RunElevated
+endif
+ 
+ 
+[Winbatch_install_64]
+c:\windows\system32\pnputil.exe /add-driver %ScriptPath%\driver\*.inf /subdirs /install

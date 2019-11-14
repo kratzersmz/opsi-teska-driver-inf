@@ -1,0 +1,30 @@
+[Package]
+version: 1
+depends: 
+
+[Product]
+type: localboot
+id: teska-driver-inf
+name: teska-driver-inf
+description: installiert inf driver via pnputil welche im driver verzeichnis liegen
+advice: 
+version: 1.0
+priority: 0
+licenseRequired: False
+productClasses: 
+setupScript: setup.ins
+uninstallScript: 
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[Changelog]
+teska-driver-inf (1.0-1) testing; urgency=low
+
+  * Initial package
+
+ -- ak <kratzer@lmz-bw.de>  Wed, 13 Nov 2019 11:43:53 +0000
+
+
