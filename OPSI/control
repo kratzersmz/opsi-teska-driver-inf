@@ -6,7 +6,7 @@ depends:
 type: localboot
 id: teska-driver-inf
 name: teska-driver-inf
-description: installiert inf driver via pnputil welche im driver verzeichnis liegen
+description: installiert double driver files welche im Dir drivers liegen
 advice: 
 version: 1.0
 priority: 0
@@ -19,6 +19,15 @@ alwaysScript:
 onceScript: 
 customScript: 
 userLoginScript: 
+
+[ProductProperty]
+type: unicode
+name: driversubdir
+multivalue: False
+editable: True
+description: Select Driver Sub Directory for finer granulation. Dir has to exist!
+values: ["HP600G4","HP600G3"]
+default: []
 
 [Changelog]
 teska-driver-inf (1.0-1) testing; urgency=low

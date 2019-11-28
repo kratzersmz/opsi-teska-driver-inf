@@ -15,6 +15,7 @@ DefVar $ProductId$
 DefVar $MinimumSpace$
 DefVar $InstallDir$
 DefVar $ExitCode$
+DefVar $val_driversubdir$
  
 Set $LogDir$ = "%SystemDrive%\tmp"
  
@@ -25,6 +26,9 @@ Set $ProductId$       = "teska-driver-inf"
 Set $MinimumSpace$    = "6 MB"
 ; the path were we find the product after the installation
 ; ----------------------------------------------------------------
+ 
+comment "Get SubDir"
+Set $val_driversubdir$ = GetProductProperty("driversubdir", "none")
  
 if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
 	LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
@@ -38,15 +42,23 @@ else
 		comment "Start uninstall sub section"
 		Sub "%ScriptPath%\delsub.ins"
 	endif
- 
+	
 	Message "Installing " + $ProductId$ + " ..."
  
 	comment "Start setup program"
 	; extract it with 7zip and you will get two msi files (32/64)
 	ChangeDirectory "%SCRIPTPATH%"
-	Winbatch_install_64 /Sysnative /RunElevated
+	
+	if not ($val_driversubdir$ = "none")
+		Winbatch_install_64_subdir
+	else
+    	Winbatch_install_64
+	endif
 endif
- 
+
  
 [Winbatch_install_64]
-c:\windows\system32\pnputil.exe /add-driver %ScriptPath%\driver\*.inf /subdirs /install
+%ScriptPath%\ddc.exe r /source:"%ScriptPath%\driver"
+
+[Winbatch_install_64_subdir]
+%ScriptPath%\ddc.exe r /source:"%ScriptPath%\driver\" + $val_driversubdir$ 
