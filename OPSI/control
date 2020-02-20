@@ -8,7 +8,7 @@ id: teska-driver-inf
 name: teska-driver-inf
 description: installiert double driver files welche im Dir drivers liegen
 advice: 
-version: 1.0
+version: 1.1
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -26,11 +26,11 @@ name: driversubdir
 multivalue: False
 editable: True
 description: Select Driver Sub Directory for finer granulation. Dir has to exist!
-values: ["HP600G4","HP600G3"]
+values: ["HP600G4","HP600G3","a555","a357"]
 default: []
 
 [Changelog]
-teska-driver-inf (1.0-1) testing; urgency=low
+teska-driver-inf (1.1-1) testing; urgency=low
 
   * Initial package
 
