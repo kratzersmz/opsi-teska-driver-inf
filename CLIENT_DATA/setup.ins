@@ -16,7 +16,10 @@ DefVar $MinimumSpace$
 DefVar $InstallDir$
 DefVar $ExitCode$
 DefVar $val_driversubdir$
+DefVar $dummy$
+DefVar $driverremove$
 
+DefStringList $list$
  
 Set $LogDir$ = "%SystemDrive%\tmp"
  
@@ -30,19 +33,35 @@ Set $MinimumSpace$    = "1000 MB"
  
 comment "Get SubDir"
 Set $val_driversubdir$ = GetProductProperty("driversubdir", "none")
+
+comment "Get driver remove"
+Set $driverremove$ = GetProductProperty("driverremove", "none")
  
 if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
         LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
         isFatalError
         ; Stop process and set installation status to failed
 else
+	set $list$ = getOutStreamFromSection("DosInAnIcon_dir")
+	if NOT (count($list$)="0")
+		for  %s% in $list$ do sub_loop
+	else
+		Logwarning "keine cer Dateien gefunden"
+	endif
     comment "Copy driver files to the client..."
+
+    if not ($driverremove$ = "none")
+	winbatch_driverremove
+    endif
+
     if not ($val_driversubdir$ = "none")
 	Files_CopyDriverFiles_subdir
     else
     	Files_CopyDriverFiles
     endif
-    Files_CopyDriverFiles
+    comment "Install certs..."
+    winbatch_import_cert
+    Files_CopyrmDriverFiles
     comment "Installing drivers..."
     winbatch_InstallDrivers /LetThemGo /SysNative
     SleepSeconds 180
@@ -51,17 +70,36 @@ else
     ;Files_DeleteDriverFiles
 endif
 
+
+
+[sub_loop]
+Set $dummy$ = "%Scriptpath%\cert\" + "%s%"
+Winbatch_import_cert /Sysnative
+
+[winbatch_import_cert]
+certutil.exe -f -addstore "TrustedPublisher" "$dummy$"
+
 [Files_CopyDriverFiles_subdir]
 CheckTargetPath = "%opsiTmpDir%\driverfiles_$ProductId$"
 copy -s "%ScriptPath%\driver\$val_driversubdir$\*" "%opsiTmpDir%\driverfiles_$ProductId$"
+
+[Files_CopyrmDriverFiles]
+CheckTargetPath = "%opsiTmpDir%\driverfiles_$ProductId$"
+copy -s "%ScriptPath%\driver_rm\*" "%opsiTmpDir%\driverrmfiles_$ProductId$"
 
 [Files_CopyDriverFiles]
 CheckTargetPath = "%opsiTmpDir%\driverfiles_$ProductId$"
 copy -s "%ScriptPath%\driver\*" "%opsiTmpDir%\driverfiles_$ProductId$"
 
+[DosInAnIcon_dir]
+@echo off
+dir /b "%SCRIPTPATH%\zertifikate\*.cer"
+
 [winbatch_InstallDrivers]
 %System%\pnputil.exe /add-driver "%opsiTmpDir%\driverfiles_$ProductId$\*.inf" /subdirs /install /reboot
 
+[winbatch_driverremove]
+%System%\pnputil.exe /delete-driver "$driverremove$" /subdirs /delete /force
 
 [Files_DeleteDriverFiles]
 del -sf "%opsiTmpDir%\driverfiles_$ProductId$"

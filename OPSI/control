@@ -8,7 +8,7 @@ id: teska-driver-inf
 name: teska-driver-inf
 description: installiert double driver files welche im Dir drivers liegen
 advice: 
-version: 1.1
+version: 1.2
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -26,10 +26,23 @@ name: driversubdir
 multivalue: False
 editable: True
 description: Select Driver Sub Directory for finer granulation. Dir has to exist!
-values: ["HP600G4","HP600G3","a555","a357"]
+values: ["HP600G3", "HP600G4", "a357", "a555"]
+default: []
+
+[ProductProperty]
+type: unicode
+name: driverremove
+multivalue: False
+editable: True
+description: Select drivername to remove, e.g. bth.inf
+values: ["bth.inf"]
 default: []
 
 [Changelog]
+teska-driver-inf (1.2-1) testing; urgency=low
+
+  * added zerts support and remove driver support
+
 teska-driver-inf (1.1-1) testing; urgency=low
 
   * Initial package
